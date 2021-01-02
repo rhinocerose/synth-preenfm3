@@ -24,6 +24,41 @@
 float Voice::glidePhaseInc[13];
 
 
+float quickEndCurve[BLOCK_SIZE] = {
+		1.0f,
+		.99743466f,
+		.98976497f,
+		.97706963f,
+		.95947891f,
+		.93717331f,
+		.91038172f,
+		.87937906f,
+		.84448346f,
+		.80605299f,
+		.76448201f,
+		.72019708f,
+		.67365263f,
+		.62532627f,
+		.57571389f,
+		.52532458f,
+		.47467542f,
+		.42428611f,
+		.37467373f,
+		.32634737f,
+		.27980292f,
+		.23551799f,
+		.19394701f,
+		.15551654f,
+		.12062094f,
+		.08961828f,
+		.06282669f,
+		.04052109f,
+		.02293037f,
+		.01023503f,
+		.00256534f,
+		.0f
+};
+
 //for bitwise manipulations
 #define FLOAT2SHORT 32768.f
 #define SHORT2FLOAT 1./32768.f
@@ -554,6 +589,15 @@ void Voice::endNoteOrBeginNextOne() {
     if (this->newNotePending) {
         // pendingNote can be 255 : see Voice:noteOff
         if (pendingNote <= 127) {
+        	// Quick End
+            float *sample = sampleBlock;
+            for (int k = 0; k < BLOCK_SIZE; k++) {
+            	float endFloat = quickEndCurve[k];
+                *sample *= endFloat;
+                sample++;
+                *sample *= endFloat;
+                sample++;
+            }
             noteOn(pendingNote, pendingNoteFrequency, pendingNoteVelocity, index);
         } else {
             // Note off have already been received....

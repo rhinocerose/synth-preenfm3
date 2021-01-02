@@ -24,6 +24,7 @@ int Env::initTab = 0;
 
 
 float envLinear[] = { 0.0f, 1.0f};
+float envFlat[] = { 0.0f, 0.0f};
 
 float envExponential[] = {
 		0.000000,0.062148,0.120174,0.174684,0.225892,0.273997,0.319188,0.361640,

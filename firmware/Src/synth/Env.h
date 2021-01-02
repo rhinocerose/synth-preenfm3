@@ -55,8 +55,9 @@ struct table {
 };
 
 extern float envLinear[];
-
 extern float envExponential[];
+// Specially for QuickEnd, the real env is done in Voice::endNoteOrBeginNextOne()
+extern float envFlat[];
 
 class Env
 {
@@ -82,8 +83,10 @@ public:
         tables[ENV_STATE_ON_REAL_S].size = 1;
         tables[ENV_STATE_ON_R].table = envExponential;
         tables[ENV_STATE_ON_R].size = 63;
-        tables[ENV_STATE_ON_QUICK_R].table = envLinear;
+        tables[ENV_STATE_ON_QUICK_R].table = envFlat;
         tables[ENV_STATE_ON_QUICK_R].size = 1;
+        // This mus be always 1.0
+		stateInc[ENV_STATE_ON_QUICK_R] = 1.0f;
     }
 
     virtual ~Env(void) {
@@ -211,16 +214,10 @@ public:
 
     void noteOffQuick(struct EnvData* env) {
         env->envState = ENV_STATE_ON_QUICK_R;
+        // We don't want to change the env here during the QuickRelease state
+        stateTarget[ENV_STATE_ON_QUICK_R] = env->currentValue;
+
         newState(env);
-
-        int duration = 6 * env->currentValue ;
-
-        if (duration == 0) {
-        	stateInc[ENV_STATE_ON_QUICK_R] = 1.0f;
-        } else {
-        	stateInc[ENV_STATE_ON_QUICK_R] = 1.0f / (float)duration;
-        }
-
     }
 
     void noteOff(struct EnvData* env, Matrix* matrix) {

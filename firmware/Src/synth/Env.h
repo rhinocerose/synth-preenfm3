@@ -32,6 +32,7 @@ enum EnvState {
     ENV_NUMBER_OF_STATES
 };
 
+#define INC_ADSR (BLOCK_SIZE / PREENFM_FREQUENCY)
 
 struct EnvData {
     // State of the env
@@ -114,13 +115,13 @@ public:
         case 2:
         case 3:
         	stateTarget[ENV_STATE_ON_D] =  envParamsA->decayLevel;
-        	stateInc[ENV_STATE_ON_D] = incTab[(int)(envParamsA->decayTime * 100.0f)];
+        	stateInc[ENV_STATE_ON_D] = INC_ADSR / envParamsA->decayTime;
             break;
         case 4:
         case 5:
         	stateTarget[ENV_STATE_ON_S] =  envParamsB->sustainLevel;
         	stateTarget[ENV_STATE_ON_REAL_S] =  envParamsB->sustainLevel;
-        	stateInc[ENV_STATE_ON_S] = incTab[(int)(envParamsB->sustainTime * 100.0f)];
+        	stateInc[ENV_STATE_ON_S] = INC_ADSR / envParamsB->sustainTime;
             stateInc[ENV_STATE_ON_REAL_S] = 0.0f;
         	break;
         case 6:
@@ -205,27 +206,20 @@ public:
             attack = 0.0f;
         }
         //stateInc[ENV_STATE_ON_A] = incTab[(int)(attack * 100.0f)];
-        env->stateIncAttack = incTab[(int)(attack * 100.0f)];
-        env->stateIncDecay= incTab[(int)(decay * 100.0f)];
+        env->stateIncAttack = INC_ADSR / attack;
+        env->stateIncDecay= INC_ADSR / decay;
 
 
-        // For Later / XH 2 Jan 2020
-        //        if (attack != 0.0f) {
-        //            env->currentValue = 0.0f;
-        //        } else {
-        //            // Attack 0s, so set currentValue and start in Decay state
-        //            env->currentValue = envParamsA->attackLevel;;
-        //        }
-        //        env->envState = ENV_STATE_ON_A;
-        //        newState(env);
-        //
-        //        return env->currentValue;
-
-        // But in the meantime
-        env->currentValue = 0.0f;
+        if (attack != 0.0f) {
+            env->currentValue = 0.0f;
+        } else {
+            // Attack 0s, so set currentValue and start in Decay state
+            env->currentValue = envParamsA->attackLevel;;
+        }
         env->envState = ENV_STATE_ON_A;
         newState(env);
-        return 0.0f;
+
+        return env->currentValue;
     }
 
     void noteOffQuick(struct EnvData* env) {
@@ -251,7 +245,7 @@ public:
     	} else {
     		release *= (1.0f + (stateTarget[ENV_STATE_ON_R] - env->currentValue)) / 2.0f;
     	}
-        env->stateIncRelease = incTab[(int)(release * 100.0f)];
+        env->stateIncRelease = INC_ADSR / release;
     	env->envState = ENV_STATE_ON_R;
         newState(env);
     }

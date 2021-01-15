@@ -677,7 +677,8 @@ void MidiDecoder::sendCurrentPatchAsNrpns(int timbre) {
             int valueToSend;
 
             if (param->displayType == DISPLAY_TYPE_FLOAT || param->displayType == DISPLAY_TYPE_FLOAT_OSC_FREQUENCY
-                    || param->displayType == DISPLAY_TYPE_FLOAT_LFO_FREQUENCY || param->displayType == DISPLAY_TYPE_LFO_KSYN) {
+                    || param->displayType == DISPLAY_TYPE_FLOAT_LFO_FREQUENCY || param->displayType == DISPLAY_TYPE_LFO_KSYN
+                    || param->displayType == DISPLAY_TYPE_FLOAT_ADSR) {
                 valueToSend = (floatValue - param->minValue) * 100.0f + .1f;
             } else {
                 valueToSend = floatValue + .1f;

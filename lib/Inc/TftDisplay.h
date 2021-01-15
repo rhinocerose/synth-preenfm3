@@ -169,7 +169,8 @@ public:
     }
 
     void printValueWithSpace(int value);
-    void printFloatWithSpace(float value);
+    void printFloatWithSpaceADSR(float value);
+    void printFloatWithSpace(float value, bool showSigned);
 
     void oscilloBgActionOperatorShape(int wfNumber);
     void oscilloBgActionEnvelope();

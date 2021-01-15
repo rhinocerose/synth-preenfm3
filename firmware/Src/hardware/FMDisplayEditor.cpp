@@ -1201,7 +1201,7 @@ struct ParameterRowDisplay envParameterRow1 = {
             0,
             16,
             1601,
-            DISPLAY_TYPE_FLOAT,
+            DISPLAY_TYPE_FLOAT_ADSR,
             nullNames,
             nullNamesOrder,
             nullNamesOrder },
@@ -1217,7 +1217,7 @@ struct ParameterRowDisplay envParameterRow1 = {
             0,
             16,
             1601,
-            DISPLAY_TYPE_FLOAT,
+            DISPLAY_TYPE_FLOAT_ADSR,
             nullNames,
             nullNamesOrder,
             nullNamesOrder },
@@ -1242,7 +1242,7 @@ struct ParameterRowDisplay envParameterRow2 = {
             0,
             16,
             1601,
-            DISPLAY_TYPE_FLOAT,
+            DISPLAY_TYPE_FLOAT_ADSR,
             nullNames,
             nullNamesOrder,
             nullNamesOrder },
@@ -1258,7 +1258,7 @@ struct ParameterRowDisplay envParameterRow2 = {
             0,
             16,
             1601,
-            DISPLAY_TYPE_FLOAT,
+            DISPLAY_TYPE_FLOAT_ADSR,
             nullNames,
             nullNamesOrder,
             nullNamesOrder },
@@ -3436,7 +3436,7 @@ void FMDisplayEditor::updateEncoderValueWithoutCursor(int row, int encoder, Para
                 displayParamValue(1, COLOR_WHITE);
             }
         } else {
-            tft_->printFloatWithSpace(newFloatValue);
+            tft_->printFloatWithSpace(newFloatValue, true);
             if (oldValue * 10.0f > LFO_FREQ_MAX_TIMES_10) {
                 // Update Sync : Second button in the page
                 displayParamValue(1, COLOR_WHITE);
@@ -3463,10 +3463,15 @@ void FMDisplayEditor::updateEncoderValueWithoutCursor(int row, int encoder, Para
             tft_->print(" Off ");
             break;
         }
-        tft_->printFloatWithSpace(newFloatValue);
+        tft_->printFloatWithSpace(newFloatValue, true);
         break;
+
+    case DISPLAY_TYPE_FLOAT_ADSR:
+        tft_->printFloatWithSpaceADSR(newFloatValue);
+        break;
+        // else what follows
     case DISPLAY_TYPE_FLOAT:
-        tft_->printFloatWithSpace(newFloatValue);
+        tft_->printFloatWithSpace(newFloatValue, true);
         break;
         // else what follows
     case DISPLAY_TYPE_INT:
@@ -3497,7 +3502,7 @@ void FMDisplayEditor::updateEncoderValueWithoutCursor(int row, int encoder, Para
                 tft_->print(' ');
             }
         } else {
-            tft_->printFloatWithSpace(newFloatValue);
+            tft_->printFloatWithSpace(newFloatValue, true);
         }
         break;
     }
@@ -3716,6 +3721,10 @@ void FMDisplayEditor::encoderTurnedPfm2(int row, int encoder4, int ticks, bool s
         // Slow down LFO frequency
         if (unlikely(param->displayType == DISPLAY_TYPE_FLOAT_LFO_FREQUENCY)) {
             if (oldValue < 1.0f) {
+                inc = inc * .1f;
+            }
+        } else if (unlikely(param->displayType == DISPLAY_TYPE_FLOAT_ADSR)) {
+            if (oldValue < 0.1f) {
                 inc = inc * .1f;
             }
         }

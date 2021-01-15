@@ -1301,12 +1301,33 @@ void TftDisplay::printValueWithSpace(int value) {
     }
 }
 
-void TftDisplay::printFloatWithSpace(float value) {
-    if (value < 0.0) {
-        print('-');
-        value = -value;
+
+void TftDisplay::printFloatWithSpaceADSR(float value) {
+    print(' ');
+    if (value < .1f) {
+        int integer = (int) (value + .0005f);
+        print('.');
+        value -= integer;
+        int valueTimes1000 = (int) (value * 1000.0f + .0005f);
+        if (valueTimes1000 < 10) {
+            print("00");
+        } else if (valueTimes1000 < 100) {
+            print("0");
+        }
+        print(valueTimes1000);
     } else {
-        print(' ');
+        printFloatWithSpace(value, false);
+    }
+}
+
+void TftDisplay::printFloatWithSpace(float value, bool showSigned) {
+    if (showSigned) {
+        if (value < 0.0) {
+            print('-');
+            value = -value;
+        } else {
+            print(' ');
+        }
     }
     if (value < 10.0f) {
         int integer = (int) (value + .0005f);

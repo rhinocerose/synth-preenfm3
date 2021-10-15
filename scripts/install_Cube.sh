@@ -14,5 +14,5 @@ echo "=============================="
 echo "  Flash preenfm2 firmware..."
 echo "=============================="
  
-${BINPATH} -c port=SWD -w ./p3_0_104.bin 0x8020000
+${BINPATH} -c port=SWD -w ./p3_0_107.bin 0x8020000
 

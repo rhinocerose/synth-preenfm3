@@ -346,7 +346,7 @@ void TftDisplay::tic(bool checkDisplayPower) {
     uint32_t offset;
     uint32_t currentMillis = HAL_GetTick();
 
-    if (unlikely((currentMillis - tftPushMillis) > 20)) {
+    if (unlikely((currentMillis - tftPushMillis) > 32)) {
 
         // Only if previous DMA pushed is finished
         if (checkDisplayPower && (currentMillis - tftGetStatusMillis) > 500) {
